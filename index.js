@@ -3,7 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
-const { webkit } = require('playwright');
+const { chromium } = require('playwright');
 //middleware
 app.use(cors());
 app.use(express.json())
@@ -15,7 +15,7 @@ const getPrivateChromePage = async () => {
     if (privatePage == null) {
         console.log(`Chrome NULL`)
         const timeout = 1000 * 60 * 10
-        const privateBrowser = await webkit.launch({
+        const privateBrowser = await chromium.launch({
             headless: true,
             timeout: timeout
         });
@@ -66,3 +66,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log("Server Is Running at Port", port);
 })
+
+module.exports = app
