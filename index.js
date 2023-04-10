@@ -4,6 +4,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 const { chromium } = require('playwright');
+const { spawnSync } = require("child_process")
 //middleware
 app.use(cors());
 app.use(express.json())
@@ -12,6 +13,7 @@ var privatePage = null
 
 const getPrivateChromePage = async () => {
     console.log(`Chrome getPrivateChromePage`)
+    spawnSync("npx", ["playwright", "install", "chromium"]);
     if (privatePage == null) {
         console.log(`Chrome NULL`)
         const timeout = 1000 * 60 * 10
