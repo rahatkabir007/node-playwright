@@ -7,7 +7,7 @@ const getPrivateChromePage = async () => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     if (privatePage == null) {
         console.log(`Chrome NULL`)
-        const timeout = 1000 * 60 * 10
+        const timeout = 1000 * 20
         const privateBrowser = await chromium.launch({
             headless: true,
             timeout: timeout

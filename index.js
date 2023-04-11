@@ -3,35 +3,12 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
-const { chromium } = require('playwright');
-const { spawnSync } = require("child_process");
+const fs = require('fs');
 const getPrivateChromePage = require("./utils/chromium");
 //middleware
 app.use(cors());
 app.use(express.json())
 
-// var privatePage = null
-
-// const getPrivateChromePage = async () => {
-//     console.log(`Chrome getPrivateChromePage`)
-//     spawnSync("npx", ["playwright", "install", "chromium"]);
-//     if (privatePage == null) {
-//         console.log(`Chrome NULL`)
-//         const timeout = 1000 * 60 * 10
-//         const privateBrowser = await chromium.launch({
-//             headless: true,
-//             timeout: timeout
-//         });
-//         const context = await privateBrowser.newContext()
-
-//         context.setDefaultNavigationTimeout(timeout)
-//         context.setDefaultTimeout(timeout)
-
-//         privatePage = await context.newPage();
-//     }
-
-//     return privatePage
-// }
 
 async function run() {
     try {
@@ -42,19 +19,43 @@ async function run() {
                 chrome = await getPrivateChromePage();
             }
             await chrome.goto("https://www.google.com/")
-            // await chrome.waitForTimeout(2000);
-            // await chrome.type(`#APjFqb`, "Jhoome Jo Pathan");
-            // await chrome.waitForTimeout(2000);
-            // await chrome.keyboard.press("Enter");
-            // await chrome.waitForTimeout(2000);
+            console.log("1");
+            await chrome.fill('input[name="q"]', 'mr beast');
+            console.log("2");
+            await chrome.press('input[name="q"]', 'Enter');
+            console.log("3");
+            await chrome.waitForSelector('#search');
+            console.log("4");
 
-            const title = await chrome.evaluate(() => {
-                return document.title
+            const { title, links } = await chrome.evaluate(() => {
+                const links = Array.from(document.querySelectorAll("#search .g .yuRUbf > a")).map(item => item.href);
+                return { title: document.title, links: links }
             })
 
-            console.log("🚀 ~ file: main.ts:20 ~ title ~ title:", title)
-            res.json({ title: title })
-        })
+            console.log("🚀 ~ file: main.ts:20 ~ title ~ title:", title, links)
+
+            fs.writeFile('data.json', JSON.stringify(links), err => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Error saving data');
+                }
+
+                res.json({ title: title, links: links })
+            });
+        });
+
+
+        app.get('/readTest', async (req, res) => {
+            fs.readFile('data.json', (err, data) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                const jsonData = JSON.parse(data);
+                console.log(jsonData);
+                res.json(jsonData)
+            });
+        });
 
     }
     finally {
