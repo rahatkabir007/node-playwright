@@ -4,33 +4,34 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 const { chromium } = require('playwright');
-const { spawnSync } = require("child_process")
+const { spawnSync } = require("child_process");
+const getPrivateChromePage = require("./utils/chromium");
 //middleware
 app.use(cors());
 app.use(express.json())
 
-var privatePage = null
+// var privatePage = null
 
-const getPrivateChromePage = async () => {
-    console.log(`Chrome getPrivateChromePage`)
-    spawnSync("npx", ["playwright", "install", "chromium"]);
-    if (privatePage == null) {
-        console.log(`Chrome NULL`)
-        const timeout = 1000 * 60 * 10
-        const privateBrowser = await chromium.launch({
-            headless: true,
-            timeout: timeout
-        });
-        const context = await privateBrowser.newContext()
+// const getPrivateChromePage = async () => {
+//     console.log(`Chrome getPrivateChromePage`)
+//     spawnSync("npx", ["playwright", "install", "chromium"]);
+//     if (privatePage == null) {
+//         console.log(`Chrome NULL`)
+//         const timeout = 1000 * 60 * 10
+//         const privateBrowser = await chromium.launch({
+//             headless: true,
+//             timeout: timeout
+//         });
+//         const context = await privateBrowser.newContext()
 
-        context.setDefaultNavigationTimeout(timeout)
-        context.setDefaultTimeout(timeout)
+//         context.setDefaultNavigationTimeout(timeout)
+//         context.setDefaultTimeout(timeout)
 
-        privatePage = await context.newPage();
-    }
+//         privatePage = await context.newPage();
+//     }
 
-    return privatePage
-}
+//     return privatePage
+// }
 
 async function run() {
     try {
@@ -54,6 +55,7 @@ async function run() {
             console.log("🚀 ~ file: main.ts:20 ~ title ~ title:", title)
             res.json({ title: title })
         })
+
     }
     finally {
 
